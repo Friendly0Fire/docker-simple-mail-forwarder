@@ -36,9 +36,6 @@ RUN cat /dev/null > /etc/postfix/aliases && newaliases \
 
 WORKDIR /app
 
-COPY install/init-openssl.sh /app/init-openssl.sh
-RUN bash -n /app/init-openssl.sh && chmod +x /app/init-openssl.sh
-
 COPY install/postfix.sh /etc/services.d/postfix/run
 RUN bash -n /etc/services.d/postfix/run && chmod +x /etc/services.d/postfix/run
 
@@ -47,6 +44,11 @@ RUN bash -n /etc/services.d/syslog-ng/run && chmod +x /etc/services.d/syslog-ng/
 
 COPY entrypoint.sh /entrypoint.sh
 RUN bash -n /entrypoint.sh && chmod a+x /entrypoint.sh
+
+## Setup folders
+RUN mkdir /etc/postfix/certs \
+    && chown -R root.postfix /etc/postfix/certs \
+    && chmod -R 750 /etc/postfix/certs
 
 VOLUME ["/var/spool/postfix"]
 

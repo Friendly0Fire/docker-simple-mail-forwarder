@@ -3,8 +3,6 @@
 echo ">> Chdir to /app..."
 cd /app
 
-[ -e BUILD.env ] && source BUILD.env
-
 if [ ! -f /entrypoint.sh ]
 then
     >&2 echo ">> you're not inside a valid docker container"
