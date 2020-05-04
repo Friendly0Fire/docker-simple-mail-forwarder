@@ -673,20 +673,24 @@ sample_directory = /etc/postfix
 # readme_directory: The location of the Postfix README files.
 #
 readme_directory = /usr/share/doc/postfix/readme
-inet_protocols = ipv4
+inet_protocols = all
 meta_directory = /etc/postfix
 shlib_directory = /usr/lib/postfix
 smtpd_banner = $myhostname ESMTP
 mail_spool_directory = /var/spool/mail/
 mailbox_command =
 smtputf8_enable = no
-virtual_alias_domains = test.com
-virtual_alias_maps = hash:/etc/postfix/virtual
-myhostname = test.com
+virtual_alias_domains = $virtual_alias_maps
+virtual_alias_maps = hash:/etc/postfix/virtual_alias.db, regexp:/etc/postfix/virtual_alias_regexp.db
+myhostname = #__DOCKER_HOSTNAME__
 mydestination = localhost
+
+relayhost = #__DOCKER_RELAY_HOST__
+transport_maps = hash:/etc/postfix/transport_maps.db, regexp:/etc/postfix/transport_maps_regexp.db
 
 smtpd_sasl_auth_enable = yes
 smtpd_sasl_security_options = noanonymous
+smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd.db
 
 broken_sasl_auth_clients = yes
 smtpd_recipient_restrictions =
@@ -703,15 +707,10 @@ smtpd_tls_security_level = may
 smtpd_tls_auth_only = no
 
 # Certification Authority
-# smtpd_tls_CAfile = /etc/postfix/cert/example-cacert.pem
+ smtpd_tls_CAfile = /etc/ssl/cert.pem
 
-# Public Certificate
-smtpd_tls_cert_file = /etc/postfix/cert/smtp.cert
-smtpd_tls_eccert_file = /etc/postfix/cert/smtp.ec.cert
-
-# Private Key (without passphrase)
-smtpd_tls_key_file = /etc/postfix/cert/smtp.key
-smtpd_tls_eckey_file = /etc/postfix/cert/smtp.ec.key
+# Certificates
+smtpd_tls_chain_files = /etc/ssl/chains.pem
 
 # Randomizer for key creation
 tls_random_source = dev:/dev/urandom

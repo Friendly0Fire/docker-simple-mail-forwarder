@@ -13,6 +13,7 @@ RUN apk add --update --no-cache \
         openssl \
         postfix \
         syslog-ng \
+        ca-certificates-bundle \
         tzdata
 
 ## Install s6 process manager
@@ -21,20 +22,11 @@ RUN curl -L -s https://github.com/just-containers/s6-overlay/releases/download/v
 
 ## Configure Service
 
-COPY install/main.dist.cf /etc/postfix/main.cf
-COPY install/master.dist.cf /etc/postfix/master.cf
-COPY install/syslog-ng.conf /etc/syslog-ng/syslog-ng.conf
+COPY install/main.dist.cf /etc/dist/main.cf
+COPY install/master.dist.cf /etc/dist/master.cf
+COPY install/syslog-ng.conf /etc/dist/syslog-ng.conf
 
-RUN cat /dev/null > /etc/postfix/aliases && newaliases \
-    && echo simple-mail-forwarder.com > /etc/hostname \
-    \
-    && echo test | saslpasswd2 -p test@test.com \
-    && chown postfix /etc/sasldb2 \
-    && saslpasswd2 -d test@test.com
-
-## Copy App
-
-WORKDIR /app
+RUN cat /dev/null > /etc/postfix/aliases && newaliases
 
 COPY install/postfix.sh /etc/services.d/postfix/run
 RUN bash -n /etc/services.d/postfix/run && chmod +x /etc/services.d/postfix/run
@@ -44,11 +36,6 @@ RUN bash -n /etc/services.d/syslog-ng/run && chmod +x /etc/services.d/syslog-ng/
 
 COPY entrypoint.sh /entrypoint.sh
 RUN bash -n /entrypoint.sh && chmod a+x /entrypoint.sh
-
-## Setup folders
-RUN mkdir /etc/postfix/certs \
-    && chown -R root.postfix /etc/postfix/certs \
-    && chmod -R 750 /etc/postfix/certs
 
 VOLUME ["/var/spool/postfix"]
 
