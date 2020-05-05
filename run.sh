@@ -33,7 +33,7 @@ docker build -t $DOCKER_IMAGE_NAME $DIR/build/.
 
 docker run \
         --name $DOCKER_CONTAINER_NAME \
-        -p 25:25 \
+        -p 25:25 -p 587:587 \
         -e HOSTNAME=$DOCKER_HOSTNAME \
         -e RELAY_HOST=$DOCKER_RELAY_HOST \
         -e CERT_FILES="$DOCKER_CHAIN_FILES" \

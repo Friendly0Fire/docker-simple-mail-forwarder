@@ -1,0 +1,2 @@
+# This file maps email addresses managed by Postfix to other (possibly external) addresses
+# See http://www.postfix.org/virtual.5.html and http://www.postfix.org/regexp_table.5.html for details on syntax

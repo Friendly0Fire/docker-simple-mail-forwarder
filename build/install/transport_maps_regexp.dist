@@ -1,0 +1,2 @@
+# This file maps a domain regular expression to a transport destination
+# See http://www.postfix.org/transport.5.html and http://www.postfix.org/regexp_table.5.html for details on syntax

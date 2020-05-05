@@ -1,0 +1,3 @@
+# This file maps a domain or wildcard to a transport destination
+# For regular expression matches, use transport_maps_regexp.db
+# See http://www.postfix.org/transport.5.html for details on syntax

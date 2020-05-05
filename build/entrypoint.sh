@@ -6,6 +6,15 @@ then
     exit 1
 fi
 
+if [ ! -f /etc/postfix/db/initialized ]
+then
+    cp /etc/postfix/db.dist/* /etc/postfix/db/
+
+    touch /etc/postfix/db/initialized
+    chown root:root /etc/postfix/db/initialized
+    chmod 700 /etc/postfix/db/initialized
+fi
+
 if [ ! -f /etc/postfix/initialized ]
 then
     ESCAPED_RELAY_HOST=$(echo $RELAY_HOST | sed -e 's/[]\/$*.^[]/\\&/g');
@@ -15,18 +24,13 @@ then
     sed -i "s|#__DOCKER_RELAY_HOST__|$ESCAPED_RELAY_HOST|" /etc/postfix/main.cf
     sed -i "s|#__DOCKER_CERTS__|$CERT_FILES|" /etc/postfix/main.cf
 
-    touch /etc/postfix/db/virtual_alias.db
-    touch /etc/postfix/db/virtual_alias_regexp.db
-    touch /etc/postfix/db/transport_maps.db
-    touch /etc/postfix/db/transport_maps_regexp.db
-    touch /etc/postfix/db/sasl_passwd.db
-
-    chown root:root /etc/postfix/db/sasl_passwd.db
-    chmod 700 /etc/postfix/db/sasl_passwd.db
-
     cat /dev/null > /etc/postfix/aliases && newaliases
 
     touch /etc/postfix/initialized
+    chown root:root /etc/postfix/initialized
+    chmod 700 /etc/postfix/initialized
+
+    rm -rf /etc/postfix/db.dist
 fi
 
 postfix set-permissions

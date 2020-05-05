@@ -1,0 +1,5 @@
+# This file maps a relayhost with a specific username and password
+# See http://www.postfix.org/postconf.5.html#relayhost for relayhost formats
+
+# Examples:
+# [mail.isp.example]    username:password
