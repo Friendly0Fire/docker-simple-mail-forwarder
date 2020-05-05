@@ -58,7 +58,7 @@ command_directory = /usr/sbin
 # daemon programs (i.e. programs listed in the master.cf file). This
 # directory must be owned by root.
 #
-daemon_directory = /usr/lib/postfix
+daemon_directory = /usr/libexec/postfix
 
 # The data_directory parameter specifies the location of Postfix-writable
 # data files (caches, random numbers). This directory must be owned
@@ -665,14 +665,10 @@ html_directory = no
 #
 manpage_directory = /usr/share/man
 
-# sample_directory: The location of the Postfix sample configuration files.
-# This parameter is obsolete as of Postfix 2.1.
-#
-sample_directory = /etc/postfix
-
 # readme_directory: The location of the Postfix README files.
 #
 readme_directory = /usr/share/doc/postfix/readme
+
 inet_protocols = all
 meta_directory = /etc/postfix
 shlib_directory = /usr/lib/postfix
@@ -681,16 +677,16 @@ mail_spool_directory = /var/spool/mail/
 mailbox_command =
 smtputf8_enable = no
 virtual_alias_domains = $virtual_alias_maps
-virtual_alias_maps = hash:/etc/postfix/virtual_alias.db, regexp:/etc/postfix/virtual_alias_regexp.db
+virtual_alias_maps = hash:/etc/postfix/db/virtual_alias.db, regexp:/etc/postfix/db/virtual_alias_regexp.db
 myhostname = #__DOCKER_HOSTNAME__
 mydestination = localhost
 
 relayhost = #__DOCKER_RELAY_HOST__
-transport_maps = hash:/etc/postfix/transport_maps.db, regexp:/etc/postfix/transport_maps_regexp.db
+transport_maps = hash:/etc/postfix/db/transport_maps.db, regexp:/etc/postfix/db/transport_maps_regexp.db
 
 smtpd_sasl_auth_enable = yes
 smtpd_sasl_security_options = noanonymous
-smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd.db
+smtp_sasl_password_maps = hash:/etc/postfix/db/sasl_passwd.db
 
 broken_sasl_auth_clients = yes
 smtpd_recipient_restrictions =
@@ -710,7 +706,7 @@ smtpd_tls_auth_only = no
  smtpd_tls_CAfile = /etc/ssl/cert.pem
 
 # Certificates
-smtpd_tls_chain_files = /etc/ssl/chains.pem
+smtpd_tls_chain_files = #__DOCKER_CERTS__
 
 # Randomizer for key creation
 tls_random_source = dev:/dev/urandom

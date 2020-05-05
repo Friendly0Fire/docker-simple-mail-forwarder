@@ -1,40 +1,35 @@
 #!/bin/bash
 
-echo ">> Chdir to /app..."
-cd /app
-
 if [ ! -f /entrypoint.sh ]
 then
     >&2 echo ">> you're not inside a valid docker container"
     exit 1
 fi
 
-if [ ! -f /etc/postfix/main.cf ]
+if [ ! -f /etc/postfix/initialized ]
 then
-    cp /etc/dist/main.cf /etc/postfix/main.cf
-    sed -i "s/#__DOCKER_HOSTNAME__/$HOSTNAME" /etc/postfix/main.cf
-    sed -i "s/#__DOCKER_TLS_CHAINS_FILE__/$TLS_CHAINS_FILE" /etc/postfix/main.cf
-    sed -i "s/#__DOCKER_RELAY_HOST__/$RELAY_HOST" /etc/postfix/main.cf
+    ESCAPED_RELAY_HOST=$(echo $RELAY_HOST | sed -e 's/[]\/$*.^[]/\\&/g');
 
-    touch /etc/postfix/virtual_alias.db
-    touch /etc/postfix/virtual_alias_regexp.db
-    touch /etc/postfix/transport_maps.db
-    touch /etc/postfix/transport_maps_regexp.db
-    touch /etc/postfix/sasl_passwd.db
+    sed -i "s|#__DOCKER_HOSTNAME__|$HOSTNAME|" /etc/postfix/main.cf
+    sed -i "s|#__DOCKER_TLS_CHAINS_FILE__|$TLS_CHAINS_FILE|" /etc/postfix/main.cf
+    sed -i "s|#__DOCKER_RELAY_HOST__|$ESCAPED_RELAY_HOST|" /etc/postfix/main.cf
+    sed -i "s|#__DOCKER_CERTS__|$CERT_FILES|" /etc/postfix/main.cf
 
-    chown root:root /etc/postfix/sasl_passwd.db
-    chmod 700 /etc/postfix/sasl_passwd.db
+    touch /etc/postfix/db/virtual_alias.db
+    touch /etc/postfix/db/virtual_alias_regexp.db
+    touch /etc/postfix/db/transport_maps.db
+    touch /etc/postfix/db/transport_maps_regexp.db
+    touch /etc/postfix/db/sasl_passwd.db
+
+    chown root:root /etc/postfix/db/sasl_passwd.db
+    chmod 700 /etc/postfix/db/sasl_passwd.db
+
+    cat /dev/null > /etc/postfix/aliases && newaliases
+
+    touch /etc/postfix/initialized
 fi
 
-if [ ! -f /etc/postfix/master.cf ]
-then
-    cp /etc/dist/main.cf /etc/postfix/master.cf
-fi
-
-if [ ! -f /etc/syslog-ng/syslog-ng.conf ]
-then
-    cp /etc/dist/syslog-ng.conf /etc/syslog-ng/syslog-ng.conf
-fi
+postfix set-permissions
 
 postfix start
 
