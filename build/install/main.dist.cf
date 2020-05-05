@@ -681,7 +681,7 @@ virtual_alias_maps = hash:/etc/postfix/db/virtual_alias, regexp:/etc/postfix/db/
 myhostname = #__DOCKER_HOSTNAME__
 mydestination = localhost
 
-relayhost = #__DOCKER_RELAY_HOST__
+relay_domains = $myhostname, hash:/etc/postfix/db/transport_maps
 transport_maps = hash:/etc/postfix/db/transport_maps, regexp:/etc/postfix/db/transport_maps_regexp
 
 smtpd_sasl_auth_enable = yes
@@ -689,10 +689,6 @@ smtpd_sasl_security_options = noanonymous
 smtp_sasl_password_maps = hash:/etc/postfix/db/sasl_passwd
 
 broken_sasl_auth_clients = yes
-smtpd_recipient_restrictions =
-   permit_sasl_authenticated,
-   permit_mynetworks,
-   reject_unauth_destination
 
 ### TLS ###
 
@@ -738,3 +734,31 @@ smtpd_tls_exclude_ciphers =
 smtp_tls_security_level = may
 
 message_size_limit = 40960000
+
+mynetworks = 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+
+# Allow connections from trusted networks only.
+smtpd_client_restrictions = permit
+
+smtpd_helo_required = yes
+
+# Don't accept mail from domains that don't exist.
+smtpd_sender_restrictions = reject_unknown_sender_domain
+
+# Spam control: exclude local clients and authenticated clients
+# from DNSBL lookups.
+smtpd_recipient_restrictions = permit_mynetworks,
+        permit_sasl_authenticated,
+        reject_rbl_client zen.spamhaus.org,
+        reject_rhsbl_reverse_client dbl.spamhaus.org,
+        reject_rhsbl_helo dbl.spamhaus.org,
+        reject_rhsbl_sender dbl.spamhaus.org
+
+# Relay control (Postfix 2.10 and later): local clients and
+# authenticated clients may specify any destination domain.
+smtpd_relay_restrictions = permit_mynetworks,
+        permit_sasl_authenticated,
+        reject_unauth_destination
+
+# Block clients that speak too early.
+smtpd_data_restrictions = reject_unauth_pipelining

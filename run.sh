@@ -35,7 +35,6 @@ docker run \
         --name $DOCKER_CONTAINER_NAME \
         -p 25:25 -p 587:587 \
         -e HOSTNAME=$DOCKER_HOSTNAME \
-        -e RELAY_HOST=$DOCKER_RELAY_HOST \
         -e CERT_FILES="$DOCKER_CHAIN_FILES" \
         $DOCKER_BIND_MOUNTS \
         -v $DIR/data/:/etc/postfix/db/ \

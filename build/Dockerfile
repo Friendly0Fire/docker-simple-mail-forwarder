@@ -8,6 +8,7 @@ RUN apk add --update --no-cache \
         bash \
         curl \
         cyrus-sasl \
+        cyrus-sasl-plain \
         drill \
         logrotate \
         openssl \
@@ -34,6 +35,7 @@ COPY install/transport_maps_regexp.dist    /etc/postfix/db.dist/transport_maps_r
 COPY install/transport_maps.dist           /etc/postfix/db.dist/transport_maps
 COPY install/virtual_alias_regexp.dist     /etc/postfix/db.dist/virtual_alias_regexp
 COPY install/virtual_alias.dist            /etc/postfix/db.dist/virtual_alias
+COPY install/relay_domains.dist            /etc/postfix/db.dist/relay_domains
 
 RUN chown root:root /etc/postfix/db.dist/sasl_passwd
 RUN chmod 700 /etc/postfix/db.dist/sasl_passwd
@@ -48,6 +50,9 @@ RUN bash -n /etc/services.d/postfix/run && chmod +x /etc/services.d/postfix/run
 
 COPY install/syslog-ng.sh /etc/services.d/syslog-ng/run
 RUN bash -n /etc/services.d/syslog-ng/run && chmod +x /etc/services.d/syslog-ng/run
+
+COPY install/saslauth.sh /etc/services.d/saslauth/run
+RUN bash -n /etc/services.d/saslauth/run && chmod +x /etc/services.d/saslauth/run
 
 COPY entrypoint.sh /entrypoint.sh
 RUN bash -n /entrypoint.sh && chmod a+x /entrypoint.sh

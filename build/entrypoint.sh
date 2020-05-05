@@ -17,11 +17,8 @@ fi
 
 if [ ! -f /etc/postfix/initialized ]
 then
-    ESCAPED_RELAY_HOST=$(echo $RELAY_HOST | sed -e 's/[]\/$*.^[]/\\&/g');
-
     sed -i "s|#__DOCKER_HOSTNAME__|$HOSTNAME|" /etc/postfix/main.cf
     sed -i "s|#__DOCKER_TLS_CHAINS_FILE__|$TLS_CHAINS_FILE|" /etc/postfix/main.cf
-    sed -i "s|#__DOCKER_RELAY_HOST__|$ESCAPED_RELAY_HOST|" /etc/postfix/main.cf
     sed -i "s|#__DOCKER_CERTS__|$CERT_FILES|" /etc/postfix/main.cf
 
     cat /dev/null > /etc/postfix/aliases && newaliases
